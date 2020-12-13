@@ -8,4 +8,4 @@ If you want to support this project or wanna contribute with some food to go alo
 
 **WORK IS IN PROGRESS**
 
-![Current state of RE](img/screenshot_01.png)
+![Current state of RE](img/Screen%20Shot%202020-12-13%20at%2017.02.29.png)
