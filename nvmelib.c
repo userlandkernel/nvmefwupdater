@@ -37,7 +37,7 @@ void __fastcall NVMeUpdateLib::DumpIdentifyData(NVMeUpdateLib *this)
   identifyData = (unsigned __int16 *)valloc(0x1000uLL);
   bzero(identifyData, 0x1000uLL);
   identifyDataRef = (unsigned __int64)identifyData;
-  NVMeUpdateLib::SendNVMeCommand(NVMEUpdateLibInstance, &identifyDataRef, &v18);
+  NVMeUpdateLib::SendNVMeCommand(NVMEUpdateLibInstance, &identifyDataRef, &v18); // See my iokitstuff repo fot the implementation of this
   if ( v19 )
     return;
   *((_BYTE *)identifyData + 0xE15) = 0;
