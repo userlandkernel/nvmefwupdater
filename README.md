@@ -7,4 +7,5 @@ This took me minor work but it's part of a bigger project of research on the iPh
 If you want to support this project or wanna contribute with some food to go along the research u can: https://paypal.me/devsupport.
 
 **WORK IS IN PROGRESS**
-![Image of Yaktocat](javascript:alert(1337))
+
+![Current state of RE](img/screenshot_01.png)
