@@ -17,36 +17,38 @@ struct option options[] = {
 };
 
 size_t file_get_contents(const char *path, char **outBuffer) {
-  int fd = open(fileName, 0, 384);
-  
-  if ( fd == - 1)
-  {
+
+  struct stat st = {};
+
+  int fd = open(path, 0, 384);
+  if ( fd == - 1) {
     printf("Error opening file %s\n", path);
     exit(1);
   }
-  
-  if ( fstat(fd, &stat) )
-  {
+
+  if ( fstat(fd, &st) ) {
     printf("Error - could not stat %s\n", path);
     close(fd);
     exit(1);
   }
-  
-  size_t statSize = stat.st_size;
-  char* buffer = valloc(stat.st_size);
+
+  size_t statSize = st.st_size;
+
+  char* buffer = valloc(st.st_size);
   bzero(buffer, statSize);
+
   size_t size = pread(fd, buffer, statSize, 0);
-  if ( size != stat.st_size )
+  if ( size != st.st_size )
   {
     puts("Error - pread failed!");
     free(buffer);
     exit(1);
   }
-  
   close(fd);
-  
-  *outBuffer = (char *)buffer;
-  return stat.st_size;
+
+  *outBuffer = (char *)buffer; // Copy out
+
+  return st.st_size;
 }
 
 
@@ -62,5 +64,13 @@ void usage(char* programName)
 
 
 int main(int argc, char *argv[]) {
+
+
+
+  if( (argc & 0xFFFFFFFE) != 2) {
+	puts("Missing/excess options/args");
+	usage(argv[0]);
+  }
+
   return 0;
 }
