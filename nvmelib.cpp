@@ -4,6 +4,16 @@
 #include <IOKit/IOKitLib.h>
 #include <CoreFoundation/CoreFoundation.h>
 
+enum AppleEmbeddedNVMeControllerAction {
+    kNVMECTL_sendNVMECommandAction = 2,
+    kNVMECTL_isBFHModeAction = 3,
+    kNVMECTL_performBFHAction = 4,
+    kNVMECTL_getNandDescriptorAction = 5,
+    kNVMECTL_setNVMeStateAction = 6,
+    kNVMECTL_setPCIPortStateAction = 7,
+    kNVMECTL_setBFHGPIOAction = 8,
+};
+
 typedef struct NVMeIdentifyControllerStruct {
 
 } NVMeIdentifyControllerStruct; // Unimplemented
@@ -51,9 +61,23 @@ NVMeUpdateLib::NVMeUpdateLib() {
 	}
 }
 
+kern_return_t NVMeUpdateLib::SetBFHMode(bool bfhMode) {
+
+	uint64_t output = 0;
+	uint64_t outputCount = 1;
+	const uint64_t input = bfhMode;
+
+	kern_return_t result = IOConnectCallMethod(svc, kNVMECTL_setBFHGPIOAction, &input,  0, 0, &output, &outputCnt, 0, 0);
+	if(!result) {
+		result = (uint32_t)output;
+	}
+	return result;
+}
+
 NVMeUpdateLib::~NVMeUpdateLib() {
 	// This is the destructor
 	IOServiceClose(conn);
 	IOObjectRelease(svc);
 }
+
 
