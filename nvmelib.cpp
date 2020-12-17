@@ -5,7 +5,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 typedef struct NVMeIdentifyControllerStruct {
-
+    char unknown[0x1000];
 } NVMeIdentifyControllerStruct; // Unimplemented
 
 class NVMeUpdateLib {
