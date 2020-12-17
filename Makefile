@@ -4,18 +4,22 @@ clean:
 	rm -f nvmefwupdater_arm64 nvmefwupdater_x86_64
 
 arm64:
-	clang \
+	clang++ \
 		-isysroot `xcode-select -p`/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS11.2.sdk \
 		-arch arm64 \
 		-O3 \
-		main.c \
+		-framework IOKit \
+		main.cpp \
+		nvmelib.cpp \
 		-o nvmefwupdater_arm64
 
 	ldid -Sentitlements.plist nvmefwupdater_arm64
 
 x86_64:
-	clang \
+	clang++ \
 		-arch x86_64 \
 		-O3 \
-		main.c \
+		-framework IOKit \
+		main.cpp \
+		nvmelib.cpp \
 		-o nvmefwupdater_x86_64

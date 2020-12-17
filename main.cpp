@@ -10,10 +10,15 @@
 #include <getopt.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
+#include "nvmelib.hpp"
+
+NVMeUpdateLib* _nvmeUpdateLib = NULL;
 
 // TODO: populated struct array
-struct option options[] = {
-
+static struct option options[] = {
+   {"query", 2, 0, 'q'},
+   {"queryVendor", 0, 0, 'f'},
+   {"queryUpdate", 1, 0, 'p'},
 };
 
 size_t file_get_contents(const char *path, char **outBuffer) {
@@ -34,7 +39,7 @@ size_t file_get_contents(const char *path, char **outBuffer) {
 
   size_t statSize = st.st_size;
 
-  char* buffer = valloc(st.st_size);
+  char* buffer = (char*)valloc(st.st_size);
   bzero(buffer, statSize);
 
   size_t size = pread(fd, buffer, statSize, 0);
@@ -65,12 +70,12 @@ void usage(char* programName)
 
 int main(int argc, char *argv[]) {
 
-
-
   if( (argc & 0xFFFFFFFE) != 2) {
 	puts("Missing/excess options/args");
 	usage(argv[0]);
   }
+
+   _nvmeUpdateLib = new NVMeUpdateLib; // Get new NVMeUpdateLib instance
 
   return 0;
 }
