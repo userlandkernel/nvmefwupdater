@@ -15,7 +15,7 @@ enum AppleEmbeddedNVMeControllerAction {
 };
 
 typedef struct NVMeIdentifyControllerStruct {
-
+    char unknown[0x1000];
 } NVMeIdentifyControllerStruct; // Unimplemented
 
 class NVMeUpdateLib {
