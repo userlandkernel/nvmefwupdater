@@ -12,7 +12,7 @@ enum AppleEmbeddedNVMeControllerAction {
     kNVMECTL_setNVMeStateAction = 6,
     kNVMECTL_setPCIPortStateAction = 7,
     kNVMECTL_setBFHGPIOAction = 8,
-};
+}; // from https://github.com/userlandkernel/iokitstuff
 
 typedef struct NVMeIdentifyControllerStruct {
     char unknown[0x1000];
