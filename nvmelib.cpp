@@ -22,6 +22,18 @@ NVMeUpdateLib::NVMeUpdateLib() {
 	}
 }
 
+kern_return_t NVMeUpdateLib::IsBFHMode(bool* bfhModeOut) {
+	return KERN_FAILURE;
+}
+
+kern_return_t NVMeUpdateLib::GetMSPType(unsigned int* mspTypeOut) {
+	return KERN_FAILURE;
+}
+
+kern_return_t NVMeUpdateLib::GetNANDDescriptor(unsigned long long* nandDescriptorOut) {
+	return KERN_FAILURE;
+}
+
 kern_return_t NVMeUpdateLib::SetBFHMode(bool bfhMode) {
 
 	uint64_t output = 0;

@@ -57,6 +57,72 @@ size_t file_get_contents(const char *path, char **outBuffer) {
 }
 
 
+void enter_bfh_mode(uint64_t bfhSize) {
+	char* loaderPath = NULL;
+	uint32_t mspType = 0;
+	uint32_t bfhLoaderID = 0;
+	uint64_t descriptor = 0xFFFFFF;
+	bool isBFHMode = 0;
+	uint32_t sz = 0;
+
+	kern_return_t err = KERN_SUCCESS;
+
+	err = _nvmeUpdateLib->GetMSPType(&mspType);
+	if (err) {
+		printf("Failed getting MSP type. Error=0x%x\n", err);
+		goto fail_and_exit;
+	}
+
+	bfhLoaderID = mspType + 1;
+	if( mspType+1 >= 5 ) {
+		printf("error. Unknown MSP type: 0x%x\n", mspType);
+		goto fail_and_exit;
+	}
+
+	if( !_nvmeUpdateLib->IsBFHMode(&isBFHMode) ) {
+
+		if(!isBFHMode) {
+			fprintf(stderr, "Not in BFH mode\n");
+			goto fail_and_exit;
+		}
+
+		if (bfhLoaderID == 3) {
+			goto get_firmware;
+		}
+
+		if (bfhSize) {
+			fprintf(stderr, "Override BFH case\n");
+			loaderPath = NULL;
+			sz = bfhSize;
+		}
+		else {
+//			loaderPath = kBFHLoaderPaths[bfhLoaderID]; // TODO
+//			fprintf(stderr, "Non-override BFH case. BFH loader path: %s\n", kBFHLoaderPaths[bfhLoaderID]);
+			sz = 0;
+		}
+		// status =  perform_bfh(loaderPath, sz);
+		// if(status) {
+		//	printf("perform_bfh failed. status=0x%x\n", status);
+		// 	goto fail_and_exit;
+		// }
+		sleep(1);
+		if( !_nvmeUpdateLib->IsBFHMode(&isBFHMode)) {
+
+get_firmware:
+			err = _nvmeUpdateLib->GetNANDDescriptor(&descriptor);
+			if(!err) {
+			//get_nand_firmware_path(descriptor, mspType);
+				exit(0);
+			}
+			fprintf(stderr, "Failed getting NAND descriptor. Error=0x%x\n", err);
+fail_and_exit:
+			exit(1);
+		}
+	}
+	puts("Failed getting BFH status.");
+	goto fail_and_exit;
+}
+
 void usage(char* programName)
 {
   printf(
@@ -75,7 +141,7 @@ int main(int argc, char *argv[]) {
 	usage(argv[0]);
   }
 
-   _nvmeUpdateLib = new NVMeUpdateLib; // Get new NVMeUpdateLib instance
+  _nvmeUpdateLib = new NVMeUpdateLib;
 
   return 0;
 }
