@@ -21,6 +21,25 @@ static struct option options[] = {
    {"queryUpdate", 1, 0, 'p'},
 };
 
+size_t read_stdin(size_t size, char **fwDataOut) {
+	size_t sz = 0;
+	void* buffer = NULL;
+
+	fprintf(stderr, "Getting file ( %llu bytes ) from stdin\n", size);
+	buffer = valloc(sz);
+	bzero(buffer, sz);
+	len = fread(buffer, 1, sz, stdin);
+	if( len < sz )
+	{
+		printf("Error - read failed! readlen %llu expected %llu\n", len, sz);
+		free(buffer);
+		exit(1);
+	}
+
+	*fwDataOut = buffer;
+	return sz;
+}
+
 size_t file_get_contents(const char *path, char **outBuffer) {
 
   struct stat st = {};
