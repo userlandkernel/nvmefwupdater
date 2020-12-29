@@ -4,6 +4,14 @@
 #include <IOKit/IOKitLib.h>
 #include <CoreFoundation/CoreFoundation.h>
 
+static const char* mspTypes[] = {
+	(char*)"S3E",
+	(char*)"S4E",
+	(char*)"M9",
+	(char*)"t302",
+	(char*)"Turks"
+};
+
 enum AppleEmbeddedNVMeControllerAction {
     kNVMECTL_sendNVMECommandAction = 2,
     kNVMECTL_isBFHModeAction = 3,

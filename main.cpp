@@ -21,8 +21,9 @@ static struct option options[] = {
    {"queryUpdate", 1, 0, 'p'},
 };
 
-size_t read_stdin(size_t size, char **fwDataOut) {
-	size_t sz = 0;
+size_t read_stdin(uint64_t size, char **fwDataOut) {
+	uint64_t len = 0;
+	uint64_t sz = 0;
 	void* buffer = NULL;
 
 	fprintf(stderr, "Getting file ( %llu bytes ) from stdin\n", size);
@@ -36,7 +37,7 @@ size_t read_stdin(size_t size, char **fwDataOut) {
 		exit(1);
 	}
 
-	*fwDataOut = buffer;
+	*fwDataOut = (char*)buffer;
 	return sz;
 }
 
@@ -73,6 +74,23 @@ size_t file_get_contents(const char *path, char **outBuffer) {
   *outBuffer = (char *)buffer; // Copy out
 
   return st.st_size;
+}
+
+
+void get_nand_firmware_path(uint64_t* nandDescriptor, uint32_t mspType) {
+	char fileName[8];
+
+	if ( nandDescriptor == (void*)0xFFFFFF) {
+		puts("Invalid-FW-File.pak");
+	}
+	else {
+		if (  (uint32_t)(mspType + 1) >= 5 ) {
+			fprintf(stderr, "error. Unknown MSP type: 0x%x\n", mspType);
+			exit(1);
+		}
+		strlcpy((char*)&fileName, mspTypes[mspType + 1], 8);
+		printf("%s/%016llX.pak\n", (char*)&fileName, (uint64_t)nandDescriptor);
+	}
 }
 
 

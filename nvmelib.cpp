@@ -35,7 +35,7 @@ kern_return_t NVMeUpdateLib::IsBFHMode(bool* bfhModeOut) {
 kern_return_t NVMeUpdateLib::GetMSPType(unsigned int* mspTypeOut) {
 	uint64_t output = 0;
 	uint32_t outputCount = 1;
-	kern_return_t result = IOConnectCallMethod(svc, kNVMECTL_GetMSPTypeAction, 0, 0, 0, 0, &output, &outputCount, 0, 0);
+	kern_return_t result = IOConnectCallMethod(svc, kNVMECTL_getMSPTypeAction, 0, 0, 0, 0, &output, &outputCount, 0, 0);
 
 	*mspTypeOut = output;
 
