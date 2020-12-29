@@ -4,12 +4,34 @@
 #include <IOKit/IOKitLib.h>
 #include <CoreFoundation/CoreFoundation.h>
 
+static char* kBFHLoaderPaths[] = {
+	(char*)"/usr/standalone/firmware/BFH/s3e-bfh-loader.bin",
+	(char*)"/usr/standalone/firmware/S4E/msp_fubfh_loader.bin",
+	(char*)"/usr/standalone/firmware/M9/msp_fubfh_loader.bin",
+	(char*)"/usr/standalone/firmware/Turks/msp_fubfh_loader.bin",
+};
+
+static char* kBFHLoaderFiles[] = {
+	(char*)"BFH/s3e-bfh-loader.bin",
+	(char*)"S4E/msp_fubfh_loader.bin",
+	(char*)"M9/msp_fubfh_loader.bin",
+	(char*)NULL,
+	(char*)NULL,
+	(char*)NULL,
+	(char*)NULL,
+	(char*)NULL,
+	(char*)NULL,
+	(char*)NULL,
+	(char*)NULL,
+	(char*)"Turks/msp_fubfh_loader.bin",
+};
+
 static const char* mspTypes[] = {
 	(char*)"S3E",
 	(char*)"S4E",
 	(char*)"M9",
 	(char*)"t302",
-	(char*)"Turks"
+	(char*)"Turks",
 };
 
 enum AppleEmbeddedNVMeControllerAction {

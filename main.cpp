@@ -96,7 +96,7 @@ void get_nand_firmware_path(uint64_t* nandDescriptor, uint32_t mspType) {
 kern_return_t perform_bfh(char* loaderPath, uint64_t size) {
 	uint32_t sz = 0;
 	char* data = NULL;
-	uint64_t status = 0;
+	uint32_t status = 0;
 	kern_return_t ret = 0;
 	char* bfhData = NULL;
 
@@ -131,6 +131,7 @@ void enter_bfh_mode(uint64_t bfhSize) {
 	uint64_t descriptor = 0xFFFFFF;
 	bool isBFHMode = 0;
 	uint32_t sz = 0;
+	uint32_t status = 0;
 
 	kern_return_t err = KERN_SUCCESS;
 
@@ -163,15 +164,15 @@ void enter_bfh_mode(uint64_t bfhSize) {
 			sz = bfhSize;
 		}
 		else {
-//			loaderPath = kBFHLoaderPaths[bfhLoaderID]; // TODO
-//			fprintf(stderr, "Non-override BFH case. BFH loader path: %s\n", kBFHLoaderPaths[bfhLoaderID]);
+			loaderPath = kBFHLoaderPaths[bfhLoaderID]; // TODO
+			fprintf(stderr, "Non-override BFH case. BFH loader path: %s\n", kBFHLoaderPaths[bfhLoaderID]);
 			sz = 0;
 		}
-		// status =  perform_bfh(loaderPath, sz);
-		// if(status) {
-		//	printf("perform_bfh failed. status=0x%x\n", status);
-		// 	goto fail_and_exit;
-		// }
+		 status =  perform_bfh(loaderPath, sz);
+		 if(status) {
+			printf("perform_bfh failed. status=0x%x\n", status);
+		 	goto fail_and_exit;
+		 }
 		sleep(1);
 		if( !_nvmeUpdateLib->IsBFHMode(&isBFHMode)) {
 
