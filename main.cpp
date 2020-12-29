@@ -93,6 +93,36 @@ void get_nand_firmware_path(uint64_t* nandDescriptor, uint32_t mspType) {
 	}
 }
 
+kern_return_t perform_bfh(char* loaderPath, uint64_t size) {
+	uint32_t sz = 0;
+	char* data = NULL;
+	uint64_t status = 0;
+	kern_return_t ret = 0;
+	char* bfhData = NULL;
+
+	if (loaderPath) {
+		sz = file_get_contents(loaderPath, &bfhData);
+	}
+	else
+	{
+		sz = size;
+		read_stdin(size, &bfhData);
+	}
+
+	data = bfhData;
+	status = _nvmeUpdateLib->PerformBFH(bfhData, sz);
+	if (status) {
+		printf("PerformBFH failed. status=0x%x\n", status);
+		ret = 1;
+	}
+	else
+	{
+		ret = 0;
+	}
+	free(data);
+	return ret;
+}
+
 
 void enter_bfh_mode(uint64_t bfhSize) {
 	char* loaderPath = NULL;
