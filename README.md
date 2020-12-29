@@ -24,3 +24,6 @@ mkdir d;
 mount -o loop,ro update.dmg d;
 
 ```
+
+### Fun fax
+- On iOS < 13.5 you may be able to update the nand without a jailbreak by using this exploit by Siguza: https://siguza.github.io/psychicpaper/ for the entitlement in this repository xD
