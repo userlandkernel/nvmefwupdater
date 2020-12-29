@@ -23,15 +23,33 @@ NVMeUpdateLib::NVMeUpdateLib() {
 }
 
 kern_return_t NVMeUpdateLib::IsBFHMode(bool* bfhModeOut) {
-	return KERN_FAILURE;
+	uint64_t output = 0;
+	uint32_t outputCount = 1;
+	kern_return_t result = IOConnectCallMethod(svc, kNVMECTL_isBFHModeAction, 0, 0, 0, 0, &output, &outputCount, 0, 0);
+
+	*bfhModeOut = output != 0;
+
+	return result;
 }
 
 kern_return_t NVMeUpdateLib::GetMSPType(unsigned int* mspTypeOut) {
-	return KERN_FAILURE;
+	uint64_t output = 0;
+	uint32_t outputCount = 1;
+	kern_return_t result = IOConnectCallMethod(svc, kNVMECTL_GetMSPTypeAction, 0, 0, 0, 0, &output, &outputCount, 0, 0);
+
+	*mspTypeOut = output;
+
+	return result;
 }
 
 kern_return_t NVMeUpdateLib::GetNANDDescriptor(unsigned long long* nandDescriptorOut) {
-	return KERN_FAILURE;
+	uint64_t output = 0;
+	uint32_t outputCnt = 1;
+	kern_return_t result = IOConnectCallMethod(svc, kNVMECTL_getNandDescriptorAction, 0, 0, 0, 0, &output, &outputCnt, 0, 0);
+
+	*nandDescriptorOut = output;
+
+	return result;
 }
 
 kern_return_t NVMeUpdateLib::SetBFHMode(bool bfhMode) {
