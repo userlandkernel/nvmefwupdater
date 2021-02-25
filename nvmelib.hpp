@@ -42,7 +42,8 @@ enum AppleEmbeddedNVMeControllerAction {
     kNVMECTL_setNVMeStateAction = 6,
     kNVMECTL_setPCIPortStateAction = 7,
     kNVMECTL_setBFHGPIOAction = 8,
-    kNVMECTL_getMSPTypeAction = 10,
+    kNVMECTL_getMSPTypeAction = 0xA,
+    kNVMECTL_firmwareVersionCheckAction = 0xC,
 };
 
 typedef struct NVMeIdentifyControllerStruct {
@@ -56,8 +57,8 @@ class NVMeUpdateLib {
 		~NVMeUpdateLib();
 		 void DumpIdentifyData();
 		 void FirmwareDownload(void* nandDescriptor, void* responseData);
-		 void FirmwareValidate(char* fileBuffer);
-		 void FirmwareVersionCheck(char* data, size_t size, uint32_t mspType);
+		 int FirmwareValidate(char* fileBuffer);
+		 kern_return_t FirmwareVersionCheck(char* data, size_t size, uint32_t mspType);
 		 kern_return_t GetClogMismatch(bool *misMatchout);
 		 kern_return_t GetMSPType(uint32_t *mspTypeOut);
 		 kern_return_t GetNANDDescriptor(uint64_t* nandDescriptor);

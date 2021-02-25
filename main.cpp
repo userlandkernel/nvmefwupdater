@@ -92,6 +92,97 @@ void get_nand_firmware_path(uint64_t* nandDescriptor, uint32_t mspType) {
 		printf("%s/%016llX.pak\n", (char*)&fileName, (uint64_t)nandDescriptor);
 	}
 }
+/*
+ * WIP
+ *
+void perform_ofw_bfh(char* firmwarePath, uint64_t firmwareSize) {	
+	uint64_t fwSize = firmwareSize;
+	char *fwPath = firmwarePath;
+	bool isBFHMode;
+	uint64_t err = 0;
+	uint32_t mspID;
+	char *fwData = NULL;
+	char* buffer = NULL;
+
+	if(_nvmeUpdateLib->IsBFHMode(&isBFHMode)) {
+		puts("Failed getting BFH status.");
+		//goto fail_and_exit;
+	}
+
+	err = _nvmeUpdateLib->GetMSPType(&mspID);
+	if(err) {
+		fprintf(stderr, "Failed getting MSP type. Error=0x%x\n", err);
+		//goto fail_and_exit;
+	}
+
+	if(fwPath) {
+		fwSize = file_get_contents(fwPath, &fwData);
+	}
+	else {
+		read_stdin(fwSize, &fwData);
+	}
+	puts("Performing BFH OFW stage...");
+	if(!isBFHMode)
+		//goto validate;
+
+	buffer = malloc(fwSize + 0x1000);
+	if(!buffer) {
+		fprintf(stderr, "%s: Failed allocating OFW BFH buffer.\n", __func__);
+		//goto fail_and_exit;
+	}
+	bzero(buffer, 0x1000);
+	if(mspID != -1)
+	{
+		*(uint32_t*)buffer = 'PUWF'; // firmware update magic
+		set_iokit_param("IODeviceTree:/arm-io/ans", "s4e-bfh-params", (uint64_t)buffer+4, 0, 0xFFC);
+		
+		// Dump the BFH parameters
+		fwrite("s4e-bfh-params: ", 0x10, 1, stderr);
+		int i = 0;
+		while(i < 0x400) {
+			if(!*(uint32_t*)buffer[4*i])
+				break;
+			fprintf(stderr, "%08X ", *(uint32_t*)&buffer[4*i++]);
+		}
+		fputc('\n', stderr);
+		memcpy(buffer + 0x1000, fwData, (uint32_t)fwSize);
+		if(mspID == 2) {
+			kern_return_t bfhError = _nvmeUpdateLib->PerformBFH(fwData, fwSize);
+			if(!bfhError) {
+				free(buffer);
+				sleep(1);
+				if(!set_pci_port_state("perst-assert"))
+				{
+					sleep(1);
+					if(!set_pci_port_state("perst-deassert"))
+					{
+						sleep(1);
+						if(mspID != -1) {
+							_nvmeUpdateLib->SetBFHMode(0);
+							goto validate;
+						}
+						if(!set_nvme_state("enable")) 
+						{
+validate:
+							kern_return_t versionCheckErr = _nvmeUpdateLib->FirmwareVersionCheck(fwData, fwSize, mspID);
+							if(versionCheckErr)
+							{
+								puts("Error Checking FW!");
+								exit(-1);
+							}
+							if( mspID == -1 )
+							{
+								puts("Validating FW...");
+								err = _nvmeUpdateLib->FirmwareValidate(fwData);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+*/
 
 kern_return_t perform_bfh(char* loaderPath, uint64_t size) {
 	uint32_t sz = 0;
@@ -179,7 +270,7 @@ void enter_bfh_mode(uint64_t bfhSize) {
 get_firmware:
 			err = _nvmeUpdateLib->GetNANDDescriptor(&descriptor);
 			if(!err) {
-			//get_nand_firmware_path(descriptor, mspType);
+				get_nand_firmware_path(descriptor, mspType);
 				exit(0);
 			}
 			fprintf(stderr, "Failed getting NAND descriptor. Error=0x%x\n", err);
