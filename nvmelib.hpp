@@ -65,7 +65,7 @@ class NVMeUpdateLib {
 		 kern_return_t IdentifyController(NVMeIdentifyControllerStruct* identity);
 		 kern_return_t IsBFHMode(bool* bfhModeOut);
 		 kern_return_t PerformBFH(char* bfhData, size_t bfhSize);
-		 kern_return_t SendNVMeCommand(uint32_t selector, const uint64_t* command, uint64_t commandSize);
+		 kern_return_t SendNVMeCommand(uint32_t selector, uint64_t* command, uint64_t commandSize);
 		 kern_return_t SetBFHMode(bool bfhMode);
 		 kern_return_t SetNVMeState(bool enableA, bool enableB);
 		 kern_return_t SetPCIPortState(bool A, bool B, uint32_t C);
@@ -73,5 +73,7 @@ class NVMeUpdateLib {
 	private:
 		io_service_t svc;
 		io_connect_t conn;
+
+
 
 };

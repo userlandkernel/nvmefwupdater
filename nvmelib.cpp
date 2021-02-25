@@ -4,6 +4,8 @@
 #include <IOKit/IOKitLib.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include "nvmelib.hpp"
+#define LOWORD(l)           ((uint16_t)(((uint32_t)(l)) & 0xffff))
+#define HIWORD(l)           ((uint16_t)((((uint32_t)(l)) >> 16) & 0xffff))
 #define HIDWORD(dw, hw) LOWORD(dw) | (hw << 16)
 #define LODWORD(dw, lw) (HIWORD(dw) << 16) | lw
 
@@ -89,14 +91,14 @@ kern_return_t NVMeUpdateLib::PerformBFH(char* bfhData, size_t bfhSize) {
 
 kern_return_t NVMeUpdateLib::FirmwareVersionCheck(char* data, size_t size, uint32_t mspType) {
 	char* input = NULL;
-	char* output = NULL;
+	uint64_t output = 0;
 	char* vbuffer = NULL;
 	uint32_t outputCount = 1;
 	uint64_t unknown1 = 0;
 	if(mspType != 2) 
 	{
 		printf("FW Revision from update file : %d.%02d.%02d\n", ((*(uint32_t*)data+1) >> 20) & 0x7F, (uint16_t)*((uint32_t*)data+1) >> 8, 1);
-		input = *((uint32_t*)data+1);
+		input = (char*)&*((uint32_t*)data+1);
 		unknown1 = 4;
 	}
 	else {
@@ -108,16 +110,20 @@ kern_return_t NVMeUpdateLib::FirmwareVersionCheck(char* data, size_t size, uint3
 		bcopy(&data[index], vbuffer, 0x10);
 	}
 	input = vbuffer;
-	kern_return_t result = IOConnectCallMethod(conn, kNVMECTL_firmwareVersionCheckAction, &input, 2, 0, 0, &output, &outputCount, 0, 0);
+	kern_return_t result = IOConnectCallMethod(conn, kNVMECTL_firmwareVersionCheckAction, (const uint64_t*)input, 2, 0, 0, &output, &outputCount, 0, 0);
 	if(vbuffer)
 		free(vbuffer);
 	return result;
 }
 
-int FirmwareValidate(char* fileBuffer) {
+kern_return_t NVMeUpdateLib::SendNVMeCommand(uint32_t selector, uint64_t* command, uint64_t commandSize) {
+	return KERN_FAILURE; // Not implemented yet
+}
+
+int NVMeUpdateLib::FirmwareValidate(char* fileBuffer) {
 	
 	char* input = NULL;
-	NVMeIdentifyControllerStruct controllerIdentity = {};
+	char controllerIdentity[0x1000];
 	kern_return_t err = KERN_SUCCESS;
 	uint32_t numConfigs = 0;
 	uint8_t config = 'E';
@@ -127,32 +133,32 @@ int FirmwareValidate(char* fileBuffer) {
 		return -1;
 	}
 
-	err = NVMeUpdateLib->SendNVMeCommand(2, (const uint64_t*)&controllerIdentity, 1);
+	err = this->SendNVMeCommand(2, (uint64_t*)&controllerIdentity, 1);
 	if(err) {
-		printf("FirmwareValidate - Identify controller failed with return status 0x%X nvme status 0x%X.\n", err, HIDWORD(err));
+		printf("FirmwareValidate - Identify controller failed with return status 0x%X nvme status 0x%X.\n", err, HIDWORD(err, err));
 		return -1;
 	}
 
 	numConfigs = (*((uint32_t*)fileBuffer+16) >> 1) & 0xFFFFFFF;
-	if(controllerIdentity.unknown[3100]) { // X
+	if(controllerIdentity[3100]) { // X
 		config = 'X';
 	}
-	printf("Current config: S3%c, Rev %X\n", config, (uint32_t)controllerIdentity.unknown[3101] + 0xA0);
-	printf("    NANDDeviceID 0x%04x\n", *((unsigned __int16 *)controllerIdentity + 1551));
-	printf("    ECCVersionNANDRevision 0x%04x\n", controllerIdentity.unknown[3104]);
+	printf("Current config: S3%c, Rev %X\n", config, (uint32_t)controllerIdentity[3101] + 0xA0);
+	printf("    NANDDeviceID 0x%04x\n", *((uint16_t *)controllerIdentity + 1551));
+	printf("    ECCVersionNANDRevision 0x%04x\n", controllerIdentity[3104]);
 	 printf(
     "    FTL Versions: CLog %d.%d, DM %d\n",
-    controllerIdentity.unknown[3105],
-    controllerIdentity.unknown[3106],
-    controllerIdentity.unknown[3107]);
-	printf("    FTL Util FMT %d\n", controllerIdentity.unknown[3109]);
+    controllerIdentity[3105],
+    controllerIdentity[3106],
+    controllerIdentity[3107]);
+	printf("    FTL Util FMT %d\n", controllerIdentity[3109]);
 	if ( !*((uint32_t*)controllerIdentity + 129) )
     	puts("Blank NAND detected. Will skip Util, DM and FTL version checking");
     printf("Num configurations in update file: %d\n", numConfigs);
     if(!numConfigs)
     	return -1;
-    // TBC
 
+    return -1; // WIP: Needs work
 }
 
 NVMeUpdateLib::~NVMeUpdateLib() {

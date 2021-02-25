@@ -21,6 +21,22 @@ static struct option options[] = {
    {"queryUpdate", 1, 0, 'p'},
 };
 
+void get_nand_firmware_path(uint64_t* nandDescriptor, uint32_t mspType) {
+	char fileName[8];
+
+	if ( nandDescriptor == (void*)0xFFFFFF) {
+		puts("Invalid-FW-File.pak");
+	}
+	else {
+		if (  (uint32_t)(mspType + 1) >= 5 ) {
+			fprintf(stderr, "error. Unknown MSP type: 0x%x\n", mspType);
+			exit(1);
+		}
+		strlcpy((char*)&fileName, mspTypes[mspType + 1], 8);
+		printf("%s/%016llX.pak\n", (char*)&fileName, (uint64_t)nandDescriptor);
+	}
+}
+
 size_t read_stdin(uint64_t size, char **fwDataOut) {
 	uint64_t len = 0;
 	uint64_t sz = 0;
@@ -77,21 +93,6 @@ size_t file_get_contents(const char *path, char **outBuffer) {
 }
 
 
-void get_nand_firmware_path(uint64_t* nandDescriptor, uint32_t mspType) {
-	char fileName[8];
-
-	if ( nandDescriptor == (void*)0xFFFFFF) {
-		puts("Invalid-FW-File.pak");
-	}
-	else {
-		if (  (uint32_t)(mspType + 1) >= 5 ) {
-			fprintf(stderr, "error. Unknown MSP type: 0x%x\n", mspType);
-			exit(1);
-		}
-		strlcpy((char*)&fileName, mspTypes[mspType + 1], 8);
-		printf("%s/%016llX.pak\n", (char*)&fileName, (uint64_t)nandDescriptor);
-	}
-}
 /*
  * WIP
  *
@@ -270,7 +271,7 @@ void enter_bfh_mode(uint64_t bfhSize) {
 get_firmware:
 			err = _nvmeUpdateLib->GetNANDDescriptor(&descriptor);
 			if(!err) {
-				get_nand_firmware_path(descriptor, mspType);
+				get_nand_firmware_path((uint64_t*)descriptor, mspType);
 				exit(0);
 			}
 			fprintf(stderr, "Failed getting NAND descriptor. Error=0x%x\n", err);
